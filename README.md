@@ -1,2 +1,3 @@
-# mu_learning
-This is a code repository for mediated uncoupled learning
+# MU-learning
+This is a repository for python module mediated_uncoupled_learning (mu_learaning).
+
