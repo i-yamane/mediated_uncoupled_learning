@@ -307,3 +307,11 @@ class NN(SklearnAdapter, BaseEstimator):  # type: ignore
 
         return y_pred
 
+    def score_indirect(
+            self,
+            data_xu: DataTuple,
+            data_uy: DataTuple,
+            sample_weight: Optional[Sequence[float]]=None
+        ) -> float:
+        raise NotImplementedError
+
