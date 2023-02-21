@@ -13,3 +13,6 @@ from ._helpers import mse_x2y_y as mse_x2y_y
 from ._helpers import acc_x2y_u2y as acc_x2y_u2y
 from ._helpers import acc_u2y_y as acc_u2y_y
 from ._helpers import acc_x2y_y as acc_x2y_y
+from ._helpers import kl_CSUB_fullbatch as kl_CSUB_fullbatch
+from ._helpers import l2_CSUB_fullbatch as l2_CSUB_fullbatch
+from ._helpers import kldiv_x2y_u2y as kldiv_x2y_u2y

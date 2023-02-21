@@ -27,6 +27,7 @@ class Combined(SklearnAdapter, BaseEstimator):  # type: ignore
         grad_clip: float=1E+10,
         weight_decay: float=0,
         optimizer: str='Adadelta',
+        lossfn_u2y: str = 'squared',
         device: Optional[torch.device]=None,
         record_loss: bool=False,
         log_metric_label: str='CMB'
@@ -40,6 +41,7 @@ class Combined(SklearnAdapter, BaseEstimator):  # type: ignore
         self.grad_clip = grad_clip
         self.weight_decay = weight_decay
         self.optimizer = optimizer
+        self.lossfn_u2y = lossfn_u2y
         self.device = device
         self.record_loss = record_loss
         self.log_metric_label = log_metric_label
@@ -54,6 +56,7 @@ class Combined(SklearnAdapter, BaseEstimator):  # type: ignore
                              'for model_x2u and model.u2y.')
 
         self._mse_torch = nn.MSELoss(reduction='mean')
+        self._sce_torch = nn.CrossEntropyLoss(reduction='mean')
 
         self._opt_x2u: Optimizer
         self._opt_u2y: Optimizer
@@ -103,7 +106,12 @@ class Combined(SklearnAdapter, BaseEstimator):  # type: ignore
                 u1, y1 = uy_batch
                 u1, y1 = u1.to(self.device), y1.to(self.device)
                 y1_pred = self.model_u2y(u1)
-                loss_u2y = self._mse_torch(y1, y1_pred)
+                if self.lossfn_u2y == 'squared':
+                    loss_u2y = self._mse_torch(y1, y1_pred)
+                elif self.lossfn_u2y == 'softmax_cross_entropy':
+                    loss_u2y = self._sce_torch(y1_pred, y1.argmax(dim=1))
+                else:
+                    raise ValueError('Pass \'squared\' or \'softmax_cross_entropy\'')
 
                 self._opt_x2u.zero_grad()
                 loss_x2u.backward()
@@ -116,11 +124,20 @@ class Combined(SklearnAdapter, BaseEstimator):  # type: ignore
                 self._opt_u2y.step()
 
             if self.record_loss:
-                lss_bat_u2y = mse_u2y_y(
-                    predict_y_from_u=self.model_u2y,
-                    loader_uy=loader_uy,
-                    device=self.device
-                )
+                if self.lossfn_u2y == 'squared':
+                    lss_bat_u2y = mse_u2y_y(
+                        predict_y_from_u=self.model_u2y,
+                        loader_uy=loader_uy,
+                        device=self.device
+                    )
+                elif self.lossfn_u2y == 'softmax_cross_entropy':
+                    lss_bat_u2y = sce_u2y_y(
+                        predict_y_from_u=self.model_u2y,
+                        loader_uy=loader_uy,
+                        device=self.device
+                    )
+                else:
+                    raise ValueError('Pass \'squared\' or \'softmax_cross_entropy\'')
                 print(i_epoch, lss_bat_u2y)
                 mlflow.log_metric(
                     key=self.log_metric_label + "_lss_bat_u2y",
