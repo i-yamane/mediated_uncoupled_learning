@@ -56,10 +56,6 @@ class MLP3(nn.Module):  # type: ignore
             dim_out: int,
             output_probability: bool=False
         ) -> None:
-        """
-        In the constructor we instantiate two nn.Linear modules and assign them as
-        member variables.
-        """
         super(MLP3, self).__init__()
 
         self.output_probability = output_probability
@@ -80,9 +76,7 @@ class MLP3(nn.Module):  # type: ignore
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore
         """
-        In the forward function we accept a Tensor of input data and we must return
-        a Tensor of output data. We can use Modules defined in the constructor as
-        well as arbitrary operators on Tensors.
+        Forward calculation.
         """
 
         y = x
@@ -100,6 +94,32 @@ class MLP3(nn.Module):  # type: ignore
         y = self.relu3(y)
 
         y = self.fc_out(y)
+
+        if self.output_probability:
+            y = torch.sigmoid(y)
+
+        return y
+
+
+class LinearModel(nn.Module):  # type: ignore
+    def __init__(
+            self,
+            dim_in: int,
+            dim_out: int,
+            output_probability: bool=False
+        ) -> None:
+        super(LinearModel, self).__init__()
+
+        self.output_probability = output_probability
+
+        self.fc_out = nn.Linear(dim_in, dim_out)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore
+        """
+        Forward calculation.
+        """
+
+        y = self.fc_out(x)
 
         if self.output_probability:
             y = torch.sigmoid(y)
