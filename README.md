@@ -10,5 +10,5 @@ In Proceedings of the 38th International Conference on Machine Learning (ICML 20
 
 [2] Ikko Yamane, Yann Chevaleyre, Takashi Ishida, and Florian Yger.
 Mediated Uncoupled Learning and Validation with Bregman Divergences: Loss Family with Maximal Generality.
-In Proceedings of the 26th International Conference on Artificial Intel- ligence and Statistics (AISTATS 2023), 2023.
+In Proceedings of the 26th International Conference on Artificial Intelligence and Statistics (AISTATS 2023), 2023.
 
